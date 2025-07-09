@@ -1,10 +1,16 @@
 import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
 import Divider from "../components/Divider";
-import Image from "next/image";
 import Link from "next/link";
+import SignInWithGoogle from "./components/SigninWithGoogle";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function Login() {
+export default async function Login() {
+  const session = await getServerSession();
+
+  if (session) return redirect("/");
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="flex flex-col gap-4 bg-[var(--foreground)]/10 rounded-md p-4">
@@ -14,14 +20,7 @@ export default function Login() {
           <Button type="submit">Login</Button>
         </form>
         <Divider />
-        <Button
-          className="bg-white text-black hover:bg-black/10"
-          leading={
-            <Image alt="google icon" src="/google.svg" width={15} height={15} />
-          }
-        >
-          Sign in with Google
-        </Button>
+        <SignInWithGoogle />
         <Link href="/" className="block">
           Back
         </Link>

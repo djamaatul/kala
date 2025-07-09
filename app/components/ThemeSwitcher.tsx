@@ -26,7 +26,7 @@ export default function ThemeSwitcher({
   }
   return (
     <Button.outline
-      className={cn("rounded-full", className)}
+      className={cn("rounded-full w-10 h-10", className)}
       onClick={() => handleTheme()}
     >
       {theme === "dark" ? <DarkIcon /> : <LightIcon />}

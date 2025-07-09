@@ -19,7 +19,7 @@ export default function Date(props: Props) {
       onClick={handleClick}
       className={cn(
         "flex justify-center items-center hover:bg-foreground/20 rounded-sm",
-        !props.primary && "text-[var(--foreground)]/20",
+        !props.primary && "text-[var(--foreground)]/30",
         props.className
       )}
     >
