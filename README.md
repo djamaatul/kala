@@ -14,4 +14,4 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Demo on vercel: [https://kala-djamaatuls-projects.vercel.app](Here)
+Demo on vercel: [Here](https://kala-djamaatuls-projects.vercel.app)
