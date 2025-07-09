@@ -19,8 +19,8 @@ export default function Month(props: MonthProps) {
       href={`/${instance.get("year")}/${instance.get("month")}`}
       className="flex flex-col gap-4 rounded-md p-4 bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20"
     >
-      <div className="">
-        <h2>{instance.format("MMMM YYYY")}</h2>
+      <div>
+        <h2 className="text-lg">{instance.format("MMMM YYYY")}</h2>
       </div>
       <div className="grid grid-cols-7 gap-2">
         {[...Array(7)].map((_, day) => {

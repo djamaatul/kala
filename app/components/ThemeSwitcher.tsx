@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { setThemeCookie } from "../actions";
+import cn from "../utils/cn";
+import Button from "./Button";
+import DarkIcon from "../icons/Dark";
+import LightIcon from "../icons/Light";
 
 export default function ThemeSwitcher({
   defaultTheme,
+  className,
 }: {
   defaultTheme: string;
+  className?: string;
 }) {
   const [theme, setTheme] = useState(defaultTheme);
 
@@ -19,15 +25,11 @@ export default function ThemeSwitcher({
     setThemeCookie(next);
   }
   return (
-    <button
-      className="bg-secondary relative px-6 py-3 flex items-center"
+    <Button.outline
+      className={cn("rounded-full", className)}
       onClick={() => handleTheme()}
     >
-      <div
-        className={`absolute top-0 h-full w-1/2 bg-white/50 ${
-          theme === "dark" ? "right-0" : "left-0 "
-        }`}
-      ></div>
-    </button>
+      {theme === "dark" ? <DarkIcon /> : <LightIcon />}
+    </Button.outline>
   );
 }

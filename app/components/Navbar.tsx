@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { cookies } from "next/headers";
+import Button from "./Button";
 
 export default async function NavBar() {
   const theme = (await cookies()).get("theme");
@@ -12,8 +13,14 @@ export default async function NavBar() {
         </h1>
         <p className="text-sm">Atur waktumu, hargai setiap Kala.</p>
       </Link>
-      <div className="flex gap-4">
-        <ThemeSwitcher defaultTheme={theme?.value ?? "dark"} />
+      <div className="flex gap-4 items-center">
+        <ThemeSwitcher
+          defaultTheme={theme?.value ?? "dark"}
+          className="hidden md:block"
+        />
+        <Link href="/login">
+          <Button>Login</Button>
+        </Link>
       </div>
     </div>
   );
