@@ -14,7 +14,7 @@ export default async function Home(props: Props) {
 
   return (
     <div className="p-4">
-      <Month year={year} month={month} classNameDay="aspect-square" />
+      <Month year={year} month={month} />
     </div>
   );
 }

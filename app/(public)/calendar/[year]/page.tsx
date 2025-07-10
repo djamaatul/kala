@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import Calendar from "../components/Calendar";
+import Calendar from "@/app/components/Calendar";
 import Image from "next/image";
 
 interface Props {

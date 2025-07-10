@@ -16,7 +16,7 @@ export default function Month(props: MonthProps) {
 
   return (
     <Link
-      href={`/${instance.get("year")}/${instance.get("month")}`}
+      href={`/calendar/${instance.get("year")}/${instance.get("month")}`}
       className="flex flex-col gap-4 rounded-md p-4 bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20"
     >
       <div>

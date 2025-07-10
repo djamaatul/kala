@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { PropsWithChildren } from "react";
-import NavBar from "../components/Navbar";
-import Footer from "../components/Footer";
-// import SideBar from "../components/SideBar";
+import NavBar from "@/app/components/Navbar";
+import Footer from "@/app/components/Footer";
+// import SideBar from "@/app/components/SideBar";
 
 export const metadata: Metadata = {
   title: "KALA",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function HomepageLayout({ children }: PropsWithChildren) {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       {/* <SideBar /> */}
       <div className="flex flex-col flex-1">
         <NavBar />

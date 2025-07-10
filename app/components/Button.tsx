@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import cn from "../utils/cn";
+import Link from "next/link";
 
 interface Props {
   leading?: ReactNode;
@@ -43,5 +44,25 @@ Button.outline = ({
     >
       {props.children}
     </Button>
+  );
+};
+
+Button.link = ({
+  className,
+  href,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & Props & { href: string }) => {
+  return (
+    <Link href={href}>
+      <Button
+        className={cn(
+          "bg-transparent border-none text-[var(--foreground)] hover:bg-transparent",
+          className
+        )}
+        {...props}
+      >
+        {props.children}
+      </Button>
+    </Link>
   );
 };

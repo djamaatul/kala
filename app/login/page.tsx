@@ -1,6 +1,6 @@
 import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
-import Divider from "../components/Divider";
+import Divider from "@/app/components/Divider";
 import Link from "next/link";
 import SignInWithGoogle from "./components/SigninWithGoogle";
 import { getServerSession } from "next-auth";
