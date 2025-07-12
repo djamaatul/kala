@@ -19,7 +19,7 @@ export default function Button({
         props.leading && !props.trailing && "justify-start",
         props.leading && props.trailing && "justify-between",
         !props.leading && props.trailing && "justify-between",
-        !props.leading && !props.trailing && "justify-center"
+        !props.leading && !props.trailing && "justify-center",
       )}
       {...props}
     >
@@ -38,7 +38,7 @@ Button.outline = ({
     <Button
       className={cn(
         "bg-transparent hover:bg-[var(--foreground)]/10 border border-[var(--foreground)]/10 text-[var(--foreground)]",
-        className
+        className,
       )}
       {...props}
     >
@@ -56,8 +56,8 @@ Button.link = ({
     <Link href={href}>
       <Button
         className={cn(
-          "bg-transparent border-none text-[var(--foreground)] hover:bg-transparent",
-          className
+          "bg-transparent border-none hover:bg-transparent p-0 text-primary",
+          className,
         )}
         {...props}
       >

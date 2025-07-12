@@ -3,7 +3,7 @@ import ThemeSwitcher from "./ThemeSwitcher";
 import { cookies } from "next/headers";
 import Button from "./Button";
 import { getServerSession } from "next-auth";
-import LogoutButton from "../login/components/LogoutButton";
+import LogoutButton from "../(unsignIn)/login/components/LogoutButton";
 
 export default async function NavBar() {
   const theme = (await cookies()).get("theme");

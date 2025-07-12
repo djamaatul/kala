@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import { Pagination } from "../types/pagintion";
 import { Query } from "../lib/db";
+import { v4 } from "uuid";
 
 export type User = {
   id: string;
-  name: string;
+  name?: string;
   password: string;
   email: string;
   created_at: string;
@@ -57,19 +58,21 @@ export default class Users {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async createUser(user: Omit<User, "createdAt" | "id">) {
+  async createUser(user: Omit<User, "created_at" | "id">) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     return this.db`
       insert into users (
+      "id",
 	    "name",
 	    "password",
 	    "email",
 			"created_at"
 			) values (
+			  ${v4()},
 			  ${user.name},
 				${hashedPassword},
 				${user.email},
-  			to_date(NOW(), 'YYYY-MM-DD HH:mi:ss')
+  			NOW()
 			)
     `;
   }

@@ -1,5 +1,6 @@
 import moment, { Moment } from "moment";
 import { Query } from "../lib/db";
+import { v4 } from "uuid";
 
 export type Event = {
   id: string;
@@ -112,6 +113,7 @@ export default class Events {
   async saveShareEvent(user_id: string, id: string) {
     return this.db<Event[]>`
       insert into events (
+        id,
         user_id,
         title,
         description,
@@ -122,6 +124,7 @@ export default class Events {
         created_at
       )
       SELECT
+        ${v4()}
         ${user_id},
         title,
         description,
