@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function SignInWithGoogle() {
   return (
     <Button
-      className="bg-white text-black hover:bg-black/10"
+      className="bg-white text-black"
       leading={
         <Image alt="google icon" src="/google.svg" width={15} height={15} />
       }

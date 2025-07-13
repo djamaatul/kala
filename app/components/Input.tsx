@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { InputHTMLAttributes } from "react";
 import cn from "../utils/cn";
@@ -20,7 +20,7 @@ export default function Input({
         className={cn(
           "bg-[var(--foreground)]/20 p-2 rounded-sm",
           className,
-          errors[name] && "border border-red-500",
+          errors[name] && "border border-red-500"
         )}
       >
         <input
