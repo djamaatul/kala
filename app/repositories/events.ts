@@ -1,4 +1,4 @@
-import moment, { Moment } from "moment";
+import moment from "moment";
 import { v4 } from "uuid";
 import { query } from "../lib/db";
 
@@ -7,12 +7,12 @@ export type Event = {
   userId: string;
   title?: string;
   description?: string;
-  start_time: Moment;
-  end_time: Moment;
+  color?: string;
+  start_time: string;
+  end_time: string;
   visibility: "public" | "private" | "shared";
-  public_slug?: string;
   shared_slug?: string;
-  createdAt: Moment;
+  createdAt: string;
 };
 export type CalendarEvent = Pick<
   Event,
