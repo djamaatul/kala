@@ -24,7 +24,7 @@ export default function Input({
         )}
       >
         <input
-          className="outline-none"
+          className="outline-none w-full"
           {...props}
           {...register(name)}
           onBlur={() => trigger(name)}

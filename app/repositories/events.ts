@@ -4,7 +4,7 @@ import { query } from "../lib/db";
 
 export type Event = {
   id: string;
-  userId: string;
+  user_id: string;
   title?: string;
   description?: string;
   color?: string;
@@ -24,11 +24,11 @@ export default class Events {
     const start = moment()
       .set("year", year)
       .startOf("day")
-      .format("YYYY-MM-DD");
+      .format("YYYY-MM-DD HH:mm:ss");
     const end = moment()
       .set("year", year)
       .endOf("day")
-      .format("YYYY-MM-DD 00:00:00");
+      .format("YYYY-MM-DD HH:mm:ss");
 
     const data = await query<CalendarEvent>`
       SELECT
@@ -41,7 +41,7 @@ export default class Events {
         events
       where
       (visibility = 'public' or (visibility = 'shared' and user_id = ${user_id})
-      and start_time between to_date(${start}, 'yyyy-mm-dd hh24:mi:ss') and to_date(${end}, 'yyyy-mm-dd hh24:mi:ss')
+      and start_time between to_date(${start}, 'yyyy-mm-dd hh24:mi:ss') and to_date(${end}, 'yyyy-mm-dd hh24:mi:ss'))
     `;
     return data.rows;
   }
@@ -50,11 +50,11 @@ export default class Events {
     const start = moment()
       .set("year", year)
       .startOf("year")
-      .format("YYYY-MM-DD");
+      .format("YYYY-MM-DD HH:mm:ss");
     const end = moment()
       .set("year", year)
       .endOf("year")
-      .format("YYYY-MM-DD 00:00:00");
+      .format("YYYY-MM-DD HH:mm:ss");
 
     const data = await query<CalendarEvent>`
       SELECT
@@ -71,7 +71,7 @@ export default class Events {
   }
 
   static async getDetailEvent(id: string) {
-    return query<Event[]>`
+    const data = await query<Event>`
       SELECT
         id,
         user_id,
@@ -79,7 +79,7 @@ export default class Events {
         description,
 				color,
         to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
-        to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
+        to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time",
         visibility,
         shared_slug,
         to_char("created_at", 'YYYY-MM-DD HH:mi:ss') as "created_at"
@@ -87,6 +87,26 @@ export default class Events {
         events
       where id = ${id}
     `;
+    return data.rows[0];
+  }
+
+  static async getDetailUserEvents(user_id: string) {
+    const data = await query<Event>`
+      SELECT
+        id,
+        user_id,
+        title,
+        description,
+				color,
+        to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
+        to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time",
+        visibility,
+        shared_slug,
+        to_char("created_at", 'YYYY-MM-DD HH:mi:ss') as "created_at"
+      from
+        events
+			where user_id = ${user_id}`;
+    return data.rows;
   }
 
   static async getDetailSharedEvent(user_id: string, shared_slug: string) {
@@ -162,7 +182,7 @@ export default class Events {
       )
       VALUES (
         ${v4()},
-        ${event.userId},
+        ${event.user_id},
         ${event.title},
 				${event.color},
         ${event.description},

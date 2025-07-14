@@ -15,7 +15,7 @@ export default async function HomepageLayout({ children }: PropsWithChildren) {
       {/* <SideBar /> */}
       <div className="flex flex-col flex-1">
         <NavBar />
-        {children}
+        <main className="flex-1 p-4">{children}</main>
         <Footer />
       </div>
     </div>

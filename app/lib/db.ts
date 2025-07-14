@@ -17,12 +17,13 @@ const query: Query = async <T extends QueryResultRow>(
   const variable: unknown[] = [];
   const query = str.reduce((acc, curr, i) => {
     let res = acc + curr;
-    if (bind[i]) {
+    if (i < bind.length) {
       res += `$${i + 1}`;
-      variable.push(bind[i]);
+      variable.push(bind[i] ?? null);
     }
     return res;
   }, "");
+
   const result = await db.query<T>(query, variable);
   return result;
 };

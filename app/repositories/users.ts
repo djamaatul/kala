@@ -22,8 +22,7 @@ export default class UsersRepository {
 			to_char("created_at", 'YYYY-MM-DD HH:mi:ss') as "created_at"
      from 
         users
-      where ID = ${user.id} OR EMAIL = ${user.email}
-    `;
+      where ID = ${user.id} OR EMAIL = ${user.email}`;
     return data.rows[0];
   }
 

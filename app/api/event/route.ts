@@ -11,6 +11,11 @@ import { v4 } from "uuid";
 
 const events: Event[] = [];
 
+export type ApiResponse<T> = {
+  code: number;
+  data?: T;
+};
+
 export async function GET(req: NextRequest) {
   const payload = Object.fromEntries(req.nextUrl.searchParams.entries());
 

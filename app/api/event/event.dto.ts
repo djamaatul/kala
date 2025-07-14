@@ -12,7 +12,7 @@ export const getEventDto = z.object({
 });
 
 export const saveEventDto = z.object({
-  userId: z.string(),
+  user_id: z.string(),
   title: z.string().optional(),
   description: z.string().optional(),
   color: z.string().optional(),
