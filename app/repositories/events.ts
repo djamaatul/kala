@@ -16,7 +16,7 @@ export type Event = {
 };
 export type CalendarEvent = Pick<
   Event,
-  "id" | "title" | "start_time" | "end_time"
+  "id" | "title" | "start_time" | "end_time" | "color"
 >;
 
 export default class Events {
@@ -34,6 +34,7 @@ export default class Events {
       SELECT
         id,
         title,
+        color,
         to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
         to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
       from
@@ -59,6 +60,7 @@ export default class Events {
       SELECT
         id,
         title,
+				color,
         to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
         to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
       from
@@ -75,6 +77,7 @@ export default class Events {
         user_id,
         title,
         description,
+				color,
         to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
         to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
         visibility,
@@ -93,6 +96,7 @@ export default class Events {
         id,
         user_id,
         title,
+				color,
         description,
         start_time,
         end_time,
@@ -117,6 +121,7 @@ export default class Events {
         id,
         user_id,
         title,
+				color,
         description,
         start_time,
         end_time,
@@ -125,9 +130,10 @@ export default class Events {
         created_at
       )
       SELECT
-        ${v4()}
+        ${v4()},
         ${user_id},
         title,
+				color,
         description,
         start_time,
         end_time,
@@ -137,7 +143,34 @@ export default class Events {
       from
         events
       where id = ${id}
-      returning *
+    `;
+  }
+
+  static async saveEvent(event: Event) {
+    return query<Event>`
+      insert into events (
+        id,
+        user_id,
+        title,
+				color,
+        description,
+        start_time,
+        end_time,
+        visibility,
+        shared_slug,
+        created_at
+      )
+      VALUES (
+        ${v4()},
+        ${event.userId},
+        ${event.title},
+				${event.color},
+        ${event.description},
+        ${event.start_time},
+        ${event.end_time},
+        ${event.visibility},
+        ${event.shared_slug},
+     	  to_date(NOW(), 'YYYY-MM-DD HH:mi:ss')
     `;
   }
 

@@ -36,7 +36,7 @@ export default async function Month(props: MonthProps) {
           const eventsOfDay = props.events?.filter((event) => {
             return moment(event.start_time, "YYYY-MM-DD HH:mm:ss").isSame(
               day.moment,
-              "day",
+              "day"
             );
           });
           return (
@@ -47,6 +47,28 @@ export default async function Month(props: MonthProps) {
               className={props.classNameDay}
               events={eventsOfDay}
             />
+          );
+        })}
+      </div>
+      <div className="flex flex-col gap-2 items-start">
+        {props.events?.map((event) => {
+          return (
+            <div
+              className="flex gap-2 text-[var(--foreground)] relative overflow-hidden rounded-md"
+              key={event.id}
+            >
+              <div
+                className="opacity-30 backdrop-blur-sm left-0 top-0 absolute h-full w-full"
+                style={{
+                  backgroundColor: event.color ?? "var(--color-red-500)",
+                }}
+              ></div>
+              <span className="bg-[var(--background)] px-2">
+                {moment(event.start_time).format("DD")}-
+                {moment(event.end_time).format("DD")}
+              </span>
+              <p className="pr-2">{event.title}</p>
+            </div>
           );
         })}
       </div>

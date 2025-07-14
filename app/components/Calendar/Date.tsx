@@ -19,7 +19,7 @@ export default function Date(props: Props) {
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
     router.push(
-      `${date.get("years")}/${date.get("month")}/${date.get("date")}`,
+      `${date.get("years")}/${date.get("month")}/${date.get("date")}`
     );
   };
 
@@ -30,18 +30,16 @@ export default function Date(props: Props) {
         "flex flex-col justify-center items-center gap-2 hover:bg-[var(--foreground)]/20 rounded-sm aspect-square relative",
         !props.primary && "text-[var(--foreground)]/30",
         date.get("day") === 0 && "text-red-500",
-        props.className,
+        props.className
       )}
     >
       {date.format("D")}
       {props.events?.map((event) => {
         return (
           <div
-            className="bg-primary text-white w-full min-h-2 text-nowrap overflow-hidden text-ellipsis text-xs"
+            className="bg-red-500 text-white w-full min-h-1 text-nowrap overflow-hidden text-ellipsis text-xs"
             key={event.id}
-          >
-            {event.title}
-          </div>
+          ></div>
         );
       })}
     </button>
