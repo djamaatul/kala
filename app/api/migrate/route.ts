@@ -19,6 +19,7 @@ export async function GET() {
 					"user_id" VARCHAR(32) NOT NULL,
 					"title" TEXT NOT NULL,
 					"description" TEXT,
+					"color" VARCHAR(32),
 					"start_time" TIMESTAMP(3) NOT NULL,
 					"end_time" TIMESTAMP(3) NOT NULL,
 					"visibility" VARCHAR(32) NOT NULL DEFAULT 'private',
@@ -26,9 +27,6 @@ export async function GET() {
 					"created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					CONSTRAINT "pk_events" PRIMARY KEY ("id")
 			);
-
-			drop index if exists uq_event_public_slug;
-			create UNIQUE INDEX "uq_event_public_slug" ON "events"("public_slug");
 			
 			drop index if exists uq_event_shared_slug;
 			create UNIQUE INDEX "uq_event_shared_slug" ON "events"("shared_slug");
