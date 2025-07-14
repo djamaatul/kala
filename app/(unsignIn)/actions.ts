@@ -2,14 +2,17 @@
 
 import { z } from "zod";
 import Users from "../repositories/users";
-import { query } from "../lib/db";
 
-const user = new Users(query);
-
-const registerSchema = z.object({
+export const registerSchema = z.object({
   name: z.string().optional(),
   email: z.email(),
-  password: z.string(),
+  password: z
+    .string()
+    .min(4)
+    .regex(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$"), {
+      message:
+        "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, and number",
+    }),
 });
 
 export const register = async (formData: z.infer<typeof registerSchema>) => {
@@ -18,7 +21,7 @@ export const register = async (formData: z.infer<typeof registerSchema>) => {
   if (!validation.success) return validation.error;
 
   try {
-    await user.createUser(validation.data);
+    await Users.createUser(validation.data);
   } catch (err) {
     console.log(err);
   }

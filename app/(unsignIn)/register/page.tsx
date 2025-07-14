@@ -15,8 +15,14 @@ export default function Register() {
       z.object({
         name: z.string().optional(),
         email: z.email(),
-        password: z.string(),
-      }),
+        password: z
+          .string()
+          .min(4)
+          .regex(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$"), {
+            message:
+              "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, and number",
+          }),
+      })
     ),
   });
 
