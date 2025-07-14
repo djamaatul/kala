@@ -1,6 +1,7 @@
-import { getServerSession } from "next-auth";
 import Calendar from "@/app/components/Calendar";
 import Image from "next/image";
+import { getSession } from "@/app/utils/session";
+import Events from "@/app/repositories/events";
 
 interface Props {
   params: Promise<{
@@ -9,26 +10,34 @@ interface Props {
 }
 
 export default async function Home({ params }: Props) {
-  const session = await getServerSession();
+  const session = await getSession();
   const year = (await params).year ?? new Date().getFullYear();
+
+  const events = await (async () => {
+    if (session) {
+      return Events.getUserEvents(session.id, year);
+    }
+    return Events.getPublicEvents(year);
+  })();
+
   return (
     <div className="p-4 space-y-8">
-      {session?.user && (
+      {session && (
         <div className="flex gap-4 items-end">
-          {session.user?.image && (
+          {session.image && (
             <Image
               alt=""
-              src={session.user?.image}
+              src={session.image}
               width={40}
               height={40}
               className="rounded-full"
             />
           )}
 
-          <h2 className="text-2xl font-bold">Hi, {session.user?.name}!</h2>
+          <h2 className="text-2xl font-bold">Hi, {session.name}!</h2>
         </div>
       )}
-      <Calendar year={year} />
+      <Calendar year={year} events={events} />
     </div>
   );
 }

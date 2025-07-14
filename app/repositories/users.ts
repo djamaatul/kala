@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { Pagination } from "../types/pagintion";
-import { Query } from "../lib/db";
+import { query } from "../lib/db";
 import { v4 } from "uuid";
 
 export type User = {
@@ -11,13 +11,9 @@ export type User = {
   created_at: string;
 };
 
-export default class Users {
-  db: Query;
-  constructor(db: Query) {
-    this.db = db;
-  }
-  getUser(id: string) {
-    return this.db`
+export default class UsersRepository {
+  static async getUser(user: Partial<Pick<User, "id" | "email">>) {
+    const data = await query<User>`
       select
       "id",
 	    "name",
@@ -26,12 +22,13 @@ export default class Users {
 			to_char("created_at", 'YYYY-MM-DD HH:mi:ss') as "created_at"
      from 
         users
-      where id = ${id} 
+      where ID = ${user.id} OR EMAIL = ${user.email}
     `;
+    return data.rows[0];
   }
 
-  getUsers({ page = 1, record = 10 }: Pagination) {
-    return this.db`
+  static async getUsers({ page = 1, record = 10 }: Pagination) {
+    const users = await query`
       select
       "id",
 	    "name",
@@ -43,24 +40,25 @@ export default class Users {
       order by "created_at" desc
       offset ${(page - 1) * record} rows fetch first ${record} rows only
     `;
+    return users.rows;
   }
 
-  async changePasswordUser(user_id: string, password: string) {
+  static async changePasswordUser(user_id: string, password: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    return this.db`
+    return query`
       update users
       set password = ${hashedPassword}
       where id = ${user_id} 
     `;
   }
 
-  async verifyPassword(password: string, hashedPassword: string) {
+  static async verifyPassword(password: string, hashedPassword: string) {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async createUser(user: Omit<User, "created_at" | "id">) {
+  static async createUser(user: Omit<User, "created_at" | "id">) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
-    return this.db`
+    return query`
       insert into users (
       "id",
 	    "name",
@@ -77,8 +75,8 @@ export default class Users {
     `;
   }
 
-  async deleteUser(user: Pick<User, "id" | "email">) {
-    return this.db`
+  static async deleteUser(user: Pick<User, "id" | "email">) {
+    return query`
       DELETE USERS WHERE ID = ${user.id} OR EMAIL = ${user.email}
     `;
   }

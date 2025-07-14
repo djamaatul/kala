@@ -11,7 +11,7 @@ export default class Calendar {
       return {
         moment: moment()
           .set("year", year)
-          .set("month", i + 1)
+          .set("month", i)
           .startOf("month"),
       };
     });

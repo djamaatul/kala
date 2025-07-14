@@ -1,29 +1,49 @@
 "use client";
 
+import { CalendarEvent } from "@/app/repositories/events";
 import cn from "@/app/utils/cn";
 import moment from "moment";
-import { PropsWithChildren } from "react";
+import { useRouter } from "next/navigation";
+import { MouseEventHandler, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren<{
   date: string;
   primary: boolean;
   className?: string;
+  events?: CalendarEvent[];
 }>;
 
 export default function Date(props: Props) {
+  const router = useRouter();
   const date = moment(props.date, "YYYY-MM-DD");
-  function handleClick() {}
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    router.push(
+      `${date.get("years")}/${date.get("month")}/${date.get("date")}`,
+    );
+  };
 
   return (
     <button
       onClick={handleClick}
       className={cn(
-        "flex justify-center items-center hover:bg-foreground/20 rounded-sm aspect-square",
+        "flex flex-col justify-center items-center gap-2 hover:bg-[var(--foreground)]/20 rounded-sm aspect-square relative",
         !props.primary && "text-[var(--foreground)]/30",
-        props.className
+        date.get("day") === 0 && "text-red-500",
+        props.className,
       )}
     >
       {date.format("D")}
+      {props.events?.map((event) => {
+        return (
+          <div
+            className="bg-primary text-white w-full min-h-2 text-nowrap overflow-hidden text-ellipsis text-xs"
+            key={event.id}
+          >
+            {event.title}
+          </div>
+        );
+      })}
     </button>
   );
 }

@@ -3,14 +3,16 @@ import Link from "next/link";
 
 import CalendarClass from "../../lib/calendar";
 import Date from "./Date";
+import { CalendarEvent } from "@/app/repositories/events";
 
 interface MonthProps {
   year: number;
   month: number;
   classNameDay?: string;
+  events?: CalendarEvent[];
 }
 
-export default function Month(props: MonthProps) {
+export default async function Month(props: MonthProps) {
   const instance = moment().set("year", props.year).set("month", props.month);
   const days = CalendarClass.getDaysOfMonth(instance);
 
@@ -22,27 +24,29 @@ export default function Month(props: MonthProps) {
       <div>
         <h2 className="text-lg">{instance.format("MMMM YYYY")}</h2>
       </div>
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7">
         {[...Array(7)].map((_, day) => {
           return (
-            <span
-              className="flex justify-center items-center"
-              key={`day-${day}`}
-            >
-              {moment().set("day", day).format("ddd")}
-            </span>
+            <div key={`day-${day}`} className="flex justify-center">
+              <span>{moment().set("day", day).format("ddd")}</span>
+            </div>
           );
         })}
         {days.map((day, index) => {
+          const eventsOfDay = props.events?.filter((event) => {
+            return moment(event.start_time, "YYYY-MM-DD HH:mm:ss").isSame(
+              day.moment,
+              "day",
+            );
+          });
           return (
             <Date
               key={`date-${index}`}
               date={day.moment.format("YYYY-MM-DD")}
               primary={day.primary}
               className={props.classNameDay}
-            >
-              {day.moment.format("D")}
-            </Date>
+              events={eventsOfDay}
+            />
           );
         })}
       </div>

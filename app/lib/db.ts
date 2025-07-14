@@ -1,16 +1,14 @@
-import { Pool, QueryArrayResult, QueryResultRow } from "pg";
+import { Pool, QueryResult, QueryResultRow } from "pg";
 
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 10,
+  max: 20,
 });
 
-db.connect();
-
-export type Query = <T extends any[]>(
+export type Query = <T extends QueryResultRow>(
   str: TemplateStringsArray,
   ...bind: any[]
-) => Promise<QueryArrayResult<T>>;
+) => Promise<QueryResult<T>>;
 
 const query: Query = async <T extends QueryResultRow>(
   str: TemplateStringsArray,

@@ -9,8 +9,8 @@ interface Props {
 
 export default async function Home(props: Props) {
   const params = await props.params;
-  const year = params.year ?? new Date().getFullYear();
-  const month = params.month ?? new Date().getMonth();
+  const year = params.year
+  const month = params.month
 
   return (
     <div className="p-4">

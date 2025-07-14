@@ -1,6 +1,6 @@
 import moment, { Moment } from "moment";
-import { Query } from "../lib/db";
 import { v4 } from "uuid";
+import { query } from "../lib/db";
 
 export type Event = {
   id: string;
@@ -14,14 +14,13 @@ export type Event = {
   shared_slug?: string;
   createdAt: Moment;
 };
+export type CalendarEvent = Pick<
+  Event,
+  "id" | "title" | "start_time" | "end_time"
+>;
 
 export default class Events {
-  db: Query;
-  constructor(db: Query) {
-    this.db = db;
-  }
-
-  async getUserEvents(user_id: string, year: number) {
+  static async getUserEvents(user_id: string, year: number) {
     const start = moment()
       .set("year", year)
       .startOf("day")
@@ -31,7 +30,7 @@ export default class Events {
       .endOf("day")
       .format("YYYY-MM-DD 00:00:00");
 
-    return this.db<Pick<Event, "id" | "title" | "start_time" | "end_time">[]>`
+    const data = await query<CalendarEvent>`
       SELECT
         id,
         title,
@@ -43,19 +42,20 @@ export default class Events {
       (visibility = 'public' or (visibility = 'shared' and user_id = ${user_id})
       and start_time between to_date(${start}, 'yyyy-mm-dd hh24:mi:ss') and to_date(${end}, 'yyyy-mm-dd hh24:mi:ss')
     `;
+    return data.rows;
   }
 
-  async getPublicEvents(year: number) {
+  static async getPublicEvents(year: number) {
     const start = moment()
       .set("year", year)
-      .startOf("day")
+      .startOf("year")
       .format("YYYY-MM-DD");
     const end = moment()
       .set("year", year)
-      .endOf("day")
+      .endOf("year")
       .format("YYYY-MM-DD 00:00:00");
 
-    return this.db<Pick<Event, "id" | "title" | "start_time" | "end_time">[]>`
+    const data = await query<CalendarEvent>`
       SELECT
         id,
         title,
@@ -65,10 +65,11 @@ export default class Events {
         events
       where visibility = 'public' and start_time between to_date(${start}, 'yyyy-mm-dd hh24:mi:ss') and to_date(${end}, 'yyyy-mm-dd hh24:mi:ss')
     `;
+    return data.rows;
   }
 
-  async getDetailEvent(id: string) {
-    return this.db<Event[]>`
+  static async getDetailEvent(id: string) {
+    return query<Event[]>`
       SELECT
         id,
         user_id,
@@ -85,8 +86,8 @@ export default class Events {
     `;
   }
 
-  async getDetailSharedEvent(user_id: string, shared_slug: string) {
-    return this.db<Event[]>`
+  static async getDetailSharedEvent(user_id: string, shared_slug: string) {
+    return query<Event>`
       with cte as (
       select
         id,
@@ -110,8 +111,8 @@ export default class Events {
     `;
   }
 
-  async saveShareEvent(user_id: string, id: string) {
-    return this.db<Event[]>`
+  static async saveShareEvent(user_id: string, id: string) {
+    return query<Event>`
       insert into events (
         id,
         user_id,
@@ -140,7 +141,7 @@ export default class Events {
     `;
   }
 
-  async deleteEvent(id: string) {
-    return this.db<Event[]>`delete events where id = ${id} returning *`;
+  static async deleteEvent(id: string) {
+    return query<Event>`delete events where id = ${id} returning *`;
   }
 }
