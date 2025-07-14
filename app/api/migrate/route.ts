@@ -3,9 +3,9 @@ import { db } from "@/app/lib/db";
 export async function GET() {
   await db.query(`
 			CREATE table if not exists "users" (
-					"id" VARCHAR(32) NOT NULL,
+					"id" VARCHAR(50) NOT NULL,
 					"name" VARCHAR(32),
-					"password" VARCHAR(32),
+					"password" VARCHAR(100),
 					"email" VARCHAR(32) NOT NULL,
 					"created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					CONSTRAINT "pk_users" PRIMARY KEY ("id")
@@ -15,8 +15,8 @@ export async function GET() {
 			create UNIQUE INDEX uq_user_email ON "users"("email");
 			
 			CREATE TABLE if not exists "events" (
-					"id" VARCHAR(32) NOT NULL,
-					"user_id" VARCHAR(32) NOT NULL,
+					"id" VARCHAR(50) NOT NULL,
+					"user_id" VARCHAR(50) NOT NULL,
 					"title" TEXT NOT NULL,
 					"description" TEXT,
 					"color" VARCHAR(32),
