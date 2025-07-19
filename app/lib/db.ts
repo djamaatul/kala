@@ -25,6 +25,7 @@ const query: Query = async <T extends QueryResultRow>(
   }, "");
 
   const result = await db.query<T>(query, variable);
+
   return result;
 };
 

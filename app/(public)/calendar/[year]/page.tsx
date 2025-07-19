@@ -2,6 +2,7 @@ import Calendar from "@/app/components/Calendar";
 import Image from "next/image";
 import { getSession } from "@/app/utils/session";
 import EventRepository from "@/app/repositories/events";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{
@@ -40,7 +41,9 @@ export default async function Home({ params }: Props) {
           <h2 className="text-2xl font-bold">Hi, {session.name}!</h2>
         </div>
       )}
-      <Calendar year={year} events={events} />
+      <Suspense fallback={<></>}>
+        <Calendar year={year} events={events} />
+      </Suspense>
     </div>
   );
 }

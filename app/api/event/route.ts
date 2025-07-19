@@ -90,6 +90,8 @@ export async function PATCH(req: Request) {
       { status: 400 }
     );
 
+  await EventRepository.updateEvent(parsed.data);
+
   return NextResponse.json(
     {
       code: 1,
@@ -108,6 +110,8 @@ export async function DELETE(req: Request) {
       { code: 0, message: parsed.error.issues },
       { status: 400 }
     );
+
+  await EventRepository.deleteEvent(parsed.data.id);
 
   return NextResponse.json(
     {

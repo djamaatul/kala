@@ -27,13 +27,15 @@ class Binding<T> {
   query: string = "";
   push(value: T, cb: (valuekey: Keys<string>) => void) {
     if (Array.isArray(value)) {
-      const keys = value.map((v) => {
+      const keys = value.flatMap((v) => {
+        if (!v) return [];
         this.bind.push(v);
         return `$${this.bind.length}`;
       });
       this.query += cb(keys);
       return;
     } else {
+      if (!value) return;
       const key = this.bind.length + 1;
       this.bind.push(value);
       this.query += cb(`$${key}`);
@@ -54,8 +56,8 @@ export default class EventRepository {
   }: GetUserCalenderEvents) {
     const bind = new Binding();
 
-    bind.push(["public", "shared", user_id], (keys) => {
-      return ` AND (visibility = ${keys[0]} or (visibility = ${keys[1]} and user_id = ${keys[2]}))`;
+    bind.push(["public", "shared", "private", user_id], (keys) => {
+      return ` AND (visibility = ${keys[0]} or (visibility IN (${keys[1]},${keys[2]}) and user_id = ${keys[3]}))`;
     });
 
     if (year) {
@@ -264,11 +266,43 @@ export default class EventRepository {
         ${event.end_time},
         ${event.visibility},
         ${event.shared_slug},
-     	  to_date(NOW(), 'YYYY-MM-DD HH:mi:ss')
+     	  NOW()
+			)
     `;
   }
 
+  static async updateEvent(event: Omit<Event, "created_at">) {
+    const bind = new Binding();
+
+    bind.push(event.title, (key) => ` title = ${key},`);
+    bind.push(event.description, (key) => ` description = ${key},`);
+    bind.push(event.color, (key) => ` color = ${key},`);
+    bind.push(
+      event.start_time,
+      (key) => ` start_time = TO_DATE(${key}, 'YYYY-MM-DD'),`
+    );
+    bind.push(
+      event.end_time,
+      (key) => ` end_time = TO_DATE(${key}, 'YYYY-MM-DD'),`
+    );
+    bind.push(event.visibility, (key) => ` visibility = ${key},`);
+    bind.push(event.shared_slug, (key) => ` shared_slug = ${key},`);
+
+    return db.query(
+      `
+			update events
+			set
+				${bind.query}
+				updated_at = NOW()
+			WHERE
+				id = $${bind.bind.length + 1}
+		`,
+      [...bind.bind, event.id]
+    );
+  }
+
   static async deleteEvent(id: string) {
-    return query<Event>`delete events where id = ${id} returning *`;
+		console.log(id)
+    return query<Event>`delete from events where id = ${id}`;
   }
 }

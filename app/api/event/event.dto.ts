@@ -2,7 +2,7 @@ import z from "zod";
 
 const formatDarteZod = z
   .string()
-  .regex(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/, "must be format YYYY-MM-DD HH:mm");
+  .regex(/\d{4}-\d{2}-\d{2}/, "must be format YYYY-MM-DD");
 
 export const queryDto = z.object({
   query: z.string().default(""),
@@ -19,10 +19,11 @@ export const saveEventDto = z.object({
   start_time: formatDarteZod,
   end_time: formatDarteZod,
   visibility: z.enum(["public", "private", "shared"]),
-  shared_slug: z.string().optional(),
+  shared_slug: z.string().optional().nullable(),
 });
 
 export const updateEventDto = z.object({
+  user_id: z.string().nonempty(),
   id: z.string(),
   title: z.string().optional(),
   description: z.string().optional(),
@@ -30,7 +31,7 @@ export const updateEventDto = z.object({
   start_time: formatDarteZod,
   end_time: formatDarteZod,
   visibility: z.enum(["public", "private", "shared"]),
-  shared_slug: z.string().optional(),
+  shared_slug: z.string().nullable(),
 });
 
 export const deleteEventDto = z.object({

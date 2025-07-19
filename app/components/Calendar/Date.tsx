@@ -27,21 +27,26 @@ export default function Date(props: Props) {
     <button
       onClick={handleClick}
       className={cn(
-        "flex flex-col justify-center items-center gap-2 hover:bg-[var(--foreground)]/20 rounded-sm aspect-square relative",
+        "flex flex-col justify-center gap-2 hover:bg-[var(--foreground)]/20 rounded-sm relative min-h-20",
         !props.primary && "text-[var(--foreground)]/30",
         date.get("day") === 0 && "text-red-500",
         props.className
       )}
     >
       {date.format("D")}
-      {props.events?.map((event) => {
-        return (
-          <div
-            className="bg-red-500 text-white w-full min-h-1 text-nowrap overflow-hidden text-ellipsis text-xs"
-            key={event.id}
-          ></div>
-        );
-      })}
+      <div className="flex flex-col gap-0.5">
+        {props.events?.map((event) => {
+          return (
+            <div
+              className="text-white w-full min-h-1 text-nowrap overflow-hidden text-ellipsis text-xs"
+              key={event.id}
+              style={{
+                backgroundColor: event.color ?? "var(--color-red-500)",
+              }}
+            ></div>
+          );
+        })}
+      </div>
     </button>
   );
 }

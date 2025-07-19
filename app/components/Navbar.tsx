@@ -15,7 +15,9 @@ export default async function NavBar() {
         <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
           KALA
         </h1>
-        <p className="text-sm">Atur waktumu, hargai setiap Kala.</p>
+        <p className="text-sm hidden md:inline-block">
+          Atur waktumu, hargai setiap Kala.
+        </p>
       </Link>
       <div className="flex gap-4 items-center">
         <ThemeSwitcher
@@ -24,7 +26,12 @@ export default async function NavBar() {
         />
 
         {session ? (
-          <LogoutButton />
+          <>
+            <Link href="/event">
+              <Button.outline>My Event</Button.outline>
+            </Link>
+            <LogoutButton />
+          </>
         ) : (
           <Link href="/login">
             <Button>Login</Button>

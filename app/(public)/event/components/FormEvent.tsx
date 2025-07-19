@@ -1,11 +1,12 @@
 "use client";
 
-import { revalidatePath, saveEventAction } from "@/app/actions";
+import { revalidatePath, saveUpdateEventAction } from "@/app/actions";
 import Button from "@/app/components/Button";
 import Field from "@/app/components/Field";
 import Input from "@/app/components/Input";
 import { Event } from "@/app/repositories/events";
 import moment from "moment";
+import { useActionState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 type Props = {
@@ -13,6 +14,14 @@ type Props = {
 };
 
 export default function FormEvent(props: Props) {
+  const [, handleSubmit, isPending] = useActionState<
+    Record<string, string>,
+    FormData
+  >((e, f) => {
+    f.append("id", props.defaultValues?.id ?? "");
+    return saveUpdateEventAction(e, f);
+  }, {});
+
   const form = useForm({
     defaultValues: {
       ...props.defaultValues,
@@ -38,7 +47,7 @@ export default function FormEvent(props: Props) {
     <FormProvider {...form}>
       <form
         className="bg-[var(--foreground)]/10 p-4 border rounded-md flex flex-col gap-4"
-        action={saveEventAction}
+        action={handleSubmit}
       >
         <div className="grid grid-cols-3 gap-4">
           <Field label="Title">
@@ -64,8 +73,8 @@ export default function FormEvent(props: Props) {
           <Field label="Visibility">
             <select
               className="bg-[var(--foreground)]/20 p-2 rounded-sm"
-              defaultValue={props.defaultValues?.visibility ?? 'private'}
-							name="visibility"
+              defaultValue={props.defaultValues?.visibility ?? "private"}
+              name="visibility"
             >
               <option value="public">Public</option>
               <option value="private">Private</option>
@@ -87,7 +96,9 @@ export default function FormEvent(props: Props) {
               </Button>
             )}
 
-            <Button type="submit">Save</Button>
+            <Button type="submit" disabled={isPending}>
+              Save
+            </Button>
           </div>
         </div>
       </form>
