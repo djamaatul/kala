@@ -1,15 +1,12 @@
 "use client";
 
-import { revalidatePath } from "@/app/actions";
-import { saveEventDto } from "@/app/api/event/event.dto";
+import { revalidatePath, saveEventAction } from "@/app/actions";
 import Button from "@/app/components/Button";
 import Field from "@/app/components/Field";
 import Input from "@/app/components/Input";
 import { Event } from "@/app/repositories/events";
 import moment from "moment";
 import { FormProvider, useForm } from "react-hook-form";
-import { v4 } from "uuid";
-import z from "zod";
 
 type Props = {
   defaultValues?: Event;
@@ -27,22 +24,6 @@ export default function FormEvent(props: Props) {
 
   const values = form.getValues();
 
-  async function handleSave() {
-    const payload: z.infer<typeof saveEventDto> = {
-      ...values,
-      visibility: values.visibility ?? "private",
-      start_time: moment(values.start_time).format("YYYY-MM-DD HH:mm"),
-      end_time: moment(values.end_time).format("YYYY-MM-DD HH:mm"),
-      user_id: values.user_id ?? v4(),
-    };
-    await fetch("/api/event", {
-      method: values.id ? "PATCH" : "POST",
-      body: JSON.stringify(payload),
-    });
-
-    await revalidatePath("/event");
-  }
-
   async function handleDelete() {
     await fetch("/api/event", {
       method: "DELETE",
@@ -55,7 +36,10 @@ export default function FormEvent(props: Props) {
 
   return (
     <FormProvider {...form}>
-      <form className="bg-[var(--foreground)]/10 p-4 border rounded-md flex flex-col gap-4">
+      <form
+        className="bg-[var(--foreground)]/10 p-4 border rounded-md flex flex-col gap-4"
+        action={saveEventAction}
+      >
         <div className="grid grid-cols-3 gap-4">
           <Field label="Title">
             <Input placeholder="Title" name="title" />
@@ -78,7 +62,11 @@ export default function FormEvent(props: Props) {
           </Field>
 
           <Field label="Visibility">
-            <select className="bg-[var(--foreground)]/20 p-2 rounded-sm">
+            <select
+              className="bg-[var(--foreground)]/20 p-2 rounded-sm"
+              defaultValue={props.defaultValues?.visibility ?? 'private'}
+							name="visibility"
+            >
               <option value="public">Public</option>
               <option value="private">Private</option>
               <option value="share">Share</option>
@@ -99,9 +87,7 @@ export default function FormEvent(props: Props) {
               </Button>
             )}
 
-            <Button type="button" onClick={handleSave}>
-              Save
-            </Button>
+            <Button type="submit">Save</Button>
           </div>
         </div>
       </form>

@@ -1,7 +1,7 @@
 import Calendar from "@/app/components/Calendar";
 import Image from "next/image";
 import { getSession } from "@/app/utils/session";
-import Events from "@/app/repositories/events";
+import EventRepository from "@/app/repositories/events";
 
 interface Props {
   params: Promise<{
@@ -15,9 +15,12 @@ export default async function Home({ params }: Props) {
 
   const events = await (async () => {
     if (session) {
-      return Events.getUserEvents(session.id, year);
+      return EventRepository.getUserCalenderEvents({
+        user_id: session.id,
+        year,
+      });
     }
-    return Events.getPublicEvents(year);
+    return EventRepository.getPublicEvents(year);
   })();
 
   return (

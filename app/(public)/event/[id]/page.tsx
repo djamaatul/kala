@@ -1,4 +1,4 @@
-import Events from "@/app/repositories/events";
+import EventRepository from "@/app/repositories/events";
 import FormEvent from "../components/FormEvent";
 
 export default async function Page({
@@ -7,7 +7,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const event = await Events.getDetailEvent(id);
+  const event = await EventRepository.getDetailEvent(id);
 	
   return (
     <div>

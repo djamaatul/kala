@@ -1,6 +1,8 @@
 import moment from "moment";
 import { v4 } from "uuid";
-import { query } from "../lib/db";
+import { query, db } from "../lib/db";
+import z from "zod";
+import { queryDto } from "../api/event/event.dto";
 
 export type Event = {
   id: string;
@@ -11,27 +13,71 @@ export type Event = {
   start_time: string;
   end_time: string;
   visibility: "public" | "private" | "shared";
-  shared_slug?: string;
-  createdAt: string;
+  shared_slug?: string | null;
+  created_at: string;
 };
 export type CalendarEvent = Pick<
   Event,
   "id" | "title" | "start_time" | "end_time" | "color"
 >;
 
-export default class Events {
-  static async getUserEvents(user_id: string, year: number) {
-    const start = moment()
-      .set("year", year)
-      .startOf("day")
-      .format("YYYY-MM-DD HH:mm:ss");
-    const end = moment()
-      .set("year", year)
-      .endOf("day")
-      .format("YYYY-MM-DD HH:mm:ss");
+type Keys<T = string | number> = T | T[];
+class Binding<T> {
+  bind: T[] = [];
+  query: string = "";
+  push(value: T, cb: (valuekey: Keys<string>) => void) {
+    if (Array.isArray(value)) {
+      const keys = value.map((v) => {
+        this.bind.push(v);
+        return `$${this.bind.length}`;
+      });
+      this.query += cb(keys);
+      return;
+    } else {
+      const key = this.bind.length + 1;
+      this.bind.push(value);
+      this.query += cb(`$${key}`);
+    }
+  }
+}
 
-    const data = await query<CalendarEvent>`
-      SELECT
+type GetUserCalenderEvents = {
+  user_id?: string;
+  year?: number;
+};
+
+type GetUserEvents = { user_id?: string } & Partial<z.Infer<typeof queryDto>>;
+export default class EventRepository {
+  static async getUserCalenderEvents({
+    user_id = "",
+    year,
+  }: GetUserCalenderEvents) {
+    const bind = new Binding();
+
+    bind.push(["public", "shared", user_id], (keys) => {
+      return ` AND (visibility = ${keys[0]} or (visibility = ${keys[1]} and user_id = ${keys[2]}))`;
+    });
+
+    if (year) {
+      const start = moment()
+        .set("year", year)
+        .startOf("year")
+        .format("YYYY-MM-DD HH:mm:ss");
+      const end = moment()
+        .set("year", year)
+        .endOf("year")
+        .format("YYYY-MM-DD HH:mm:ss");
+
+      bind.push(
+        start,
+        (key) =>
+          ` and start_time between to_date(${key}, 'yyyy-mm-dd hh24:mi:ss')`
+      );
+      bind.push(end, (key) => ` and to_date(${key}, 'yyyy-mm-dd hh24:mi:ss')`);
+    }
+
+    const data = await db.query<CalendarEvent>(
+      `SELECT
         id,
         title,
         color,
@@ -39,10 +85,38 @@ export default class Events {
         to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
       from
         events
-      where
-      (visibility = 'public' or (visibility = 'shared' and user_id = ${user_id})
-      and start_time between to_date(${start}, 'yyyy-mm-dd hh24:mi:ss') and to_date(${end}, 'yyyy-mm-dd hh24:mi:ss'))
-    `;
+      where 1=1 ${bind.query}
+    `,
+      bind.bind
+    );
+
+    return data.rows;
+  }
+
+  static async getUserEvents({ user_id }: GetUserEvents) {
+    const bind = new Binding();
+
+    bind.push(user_id, (keys) => ` AND user_id = ${keys}`);
+
+    const data = await db.query<Event>(
+      `SELECT
+        id,
+        user_id,
+        title,
+        description,
+				color,
+        visibility,
+        shared_slug,
+        to_char("created_at", 'YYYY-MM-DD HH:mi:ss') as "created_at",
+        to_char("start_time", 'YYYY-MM-DD HH:mi:ss') as "start_time",
+        to_char("end_time", 'YYYY-MM-DD HH:mi:ss') as "end_time"
+      from
+        events
+      where 1=1 ${bind.query}
+    `,
+      bind.bind
+    );
+
     return data.rows;
   }
 
@@ -166,7 +240,7 @@ export default class Events {
     `;
   }
 
-  static async saveEvent(event: Event) {
+  static async saveEvent(event: Omit<Event, "created_at" | "id">) {
     return query<Event>`
       insert into events (
         id,

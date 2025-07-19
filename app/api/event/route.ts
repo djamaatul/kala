@@ -1,15 +1,12 @@
+import EventRepository from "@/app/repositories/events";
 import {
   deleteEventDto,
-  getEventDto,
+  queryDto,
   saveEventDto,
   updateEventDto,
 } from "./event.dto";
-import { Event } from "@/app/repositories/events";
-import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 } from "uuid";
-
-const events: Event[] = [];
+import { getSession } from "@/app/utils/session";
 
 export type ApiResponse<T> = {
   code: number;
@@ -17,9 +14,10 @@ export type ApiResponse<T> = {
 };
 
 export async function GET(req: NextRequest) {
+  const session = await getSession();
   const payload = Object.fromEntries(req.nextUrl.searchParams.entries());
 
-  const parsed = getEventDto.safeParse(payload);
+  const parsed = queryDto.safeParse(payload);
 
   if (!parsed.success)
     return NextResponse.json(
@@ -27,21 +25,11 @@ export async function GET(req: NextRequest) {
       { status: 400 }
     );
 
-  const { query, page, record, order } = parsed.data;
+  const data = await EventRepository.getUserEvents({
+    user_id: session?.id,
+    ...parsed.data,
+  });
 
-  const data = events
-    .filter((x) => `${x.title}`.includes(query))
-    .slice(+record * (+page - 1), +record * +page)
-    .sort((a, b) => {
-      if (order.toLowerCase() === "DESC")
-        return `${b.title}`
-          .toLowerCase()
-          .localeCompare(`${a.title}`.toLowerCase());
-
-      return `${a.title}`
-        .toLowerCase()
-        .localeCompare(`${b.title}`.toLowerCase());
-    });
   return NextResponse.json(
     {
       code: 1,
@@ -55,8 +43,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   const body = await req.json();
+  const session = await getSession();
 
-  const parsed = saveEventDto.safeParse(body);
+  if (!session)
+    return NextResponse.json(
+      { code: 0, message: "Not authorized" },
+      { status: 401 }
+    );
+
+  const parsed = saveEventDto.safeParse({
+    ...body,
+    user_id: session.id,
+  });
 
   if (!parsed.success)
     return NextResponse.json(
@@ -64,11 +62,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
 
-  events.push({
-    ...parsed.data,
-    id: v4(),
-    createdAt: moment().toISOString(),
-  });
+  await EventRepository.saveEvent(parsed.data);
 
   return NextResponse.json(
     {
@@ -80,6 +74,13 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   const body = await req.json();
+  const session = await getSession();
+
+  if (!session)
+    return NextResponse.json(
+      { code: 0, message: "Not authorized" },
+      { status: 401 }
+    );
 
   const parsed = updateEventDto.safeParse(body);
 
@@ -89,15 +90,6 @@ export async function PATCH(req: Request) {
       { status: 400 }
     );
 
-  const index = events.findIndex(({ id }) => id === parsed.data.id);
-
-  if (!~index) return NextResponse.json({ code: 0 }, { status: 400 });
-
-  events[index] = {
-    ...events[index],
-    ...body,
-  };
-
   return NextResponse.json(
     {
       code: 1,
@@ -105,6 +97,7 @@ export async function PATCH(req: Request) {
     { status: 200 }
   );
 }
+
 export async function DELETE(req: Request) {
   const body = await req.json();
 
@@ -115,12 +108,6 @@ export async function DELETE(req: Request) {
       { code: 0, message: parsed.error.issues },
       { status: 400 }
     );
-
-  const index = events.findIndex(({ id }) => id === parsed.data.id);
-
-  if (!~index) return NextResponse.json({ code: 0 }, { status: 400 });
-
-  events.splice(index, 1);
 
   return NextResponse.json(
     {

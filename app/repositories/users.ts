@@ -55,7 +55,7 @@ export default class UsersRepository {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  static async createUser(user: Omit<User, "created_at" | "id">) {
+  static async createUser(user: Omit<User, "created_at" | "id"> & { id?: string }) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     return query`
       insert into users (
@@ -65,7 +65,7 @@ export default class UsersRepository {
 	    "email",
 			"created_at"
 			) values (
-			  ${v4()},
+			  ${user.id ?? v4()},
 			  ${user.name},
 				${hashedPassword},
 				${user.email},

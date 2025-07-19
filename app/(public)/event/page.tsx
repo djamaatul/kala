@@ -1,30 +1,26 @@
-import { Event } from "@/app/repositories/events";
+import EventRepository from "@/app/repositories/events";
 import FormEvent from "./components/FormEvent";
-// import { getSession } from "@/app/utils/session";
-// import { redirect } from "next/navigation";
-import { ApiResponse } from "@/app/api/event/route";
-import { v4 } from "uuid";
+import { getSession } from "@/app/utils/session";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-  // const session = await getSession();
-  // if (!session) return redirect("/404");
+  const session = await getSession();
 
-  // const events = await Events.getDetailUserEvents(session.id);
-  const events = await fetch(process.env.BASE_URL + "/api/event");
+  if (!session) return redirect("/404");
 
-  const data: ApiResponse<Event[]> = await events.json();
+  const events = await EventRepository.getUserEvents({
+    user_id: session.id,
+  });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8">
       <FormEvent />
-      {data.data?.map((event) => {
-        return (
-          <FormEvent
-            key={event.id}
-            defaultValues={{ ...event, user_id: v4() }}
-          />
-        );
-      })}
+      <h4 className="text-lg font-semibold">My Event</h4>
+      <div className="flex flex-col gap-4">
+        {events?.map((event) => {
+          return <FormEvent key={event.id} defaultValues={event} />;
+        })}
+      </div>
     </div>
   );
 }

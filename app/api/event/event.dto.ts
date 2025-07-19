@@ -4,7 +4,7 @@ const formatDarteZod = z
   .string()
   .regex(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/, "must be format YYYY-MM-DD HH:mm");
 
-export const getEventDto = z.object({
+export const queryDto = z.object({
   query: z.string().default(""),
   page: z.number().default(1),
   record: z.number().optional().default(5),
