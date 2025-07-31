@@ -115,6 +115,7 @@ export default class EventRepository {
       from
         events
       where 1=1 ${bind.query}
+			order by created_at desc
     `,
       bind.bind
     );

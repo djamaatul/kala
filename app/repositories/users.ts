@@ -55,7 +55,9 @@ export default class UsersRepository {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  static async createUser(user: Omit<User, "created_at" | "id"> & { id?: string }) {
+  static async createUser(
+    user: Omit<User, "created_at" | "id"> & { id?: string }
+  ) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     return query`
       insert into users (
@@ -72,6 +74,24 @@ export default class UsersRepository {
   			NOW()
 			)
     `;
+  }
+
+  static async login({ email, password }: { email: string; password: string }) {
+    const user = await UsersRepository.getUser({
+      email: email,
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const valid = await UsersRepository.verifyPassword(password, user.password);
+
+    if (!valid) throw new Error("Password does'nt match");
+
+		return {
+			id: user.id,
+			email: user.email,
+			name: user.name
+		};
   }
 
   static async deleteUser(user: Pick<User, "id" | "email">) {
