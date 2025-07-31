@@ -9,12 +9,23 @@ interface MonthProps {
   year: number;
   month: number;
   classNameDay?: string;
-  events?: CalendarEvent[];
+  events: CalendarEvent[];
 }
 
 export default async function Month(props: MonthProps) {
   const instance = moment().set("year", props.year).set("month", props.month);
   const days = CalendarClass.getDaysOfMonth(instance);
+
+  const eventOfMonth = props.events.filter((event) => {
+    return (
+      days[0].moment
+        .startOf("day")
+        .isSameOrBefore(moment(event.start_time, "YYYY-MM-DD HH:mm:ss")) &&
+      days[days.length - 1].moment
+        .endOf("day")
+        .isSameOrAfter(moment(event.end_time, "YYYY-MM-DD HH:mm:ss"))
+    );
+  });
 
   return (
     <Link
@@ -33,55 +44,43 @@ export default async function Month(props: MonthProps) {
           );
         })}
         {days.map((day, index) => {
-          const eventsOfDay = props.events?.filter((event) => {
-            return moment(event.start_time, "YYYY-MM-DD HH:mm:ss").isSame(
-              day.moment,
-              "day"
-            );
-          });
           return (
             <Date
               key={`date-${index}`}
               date={day.moment.format("YYYY-MM-DD")}
               primary={day.primary}
               className={props.classNameDay}
-              events={eventsOfDay}
+              events={eventOfMonth}
             />
           );
         })}
       </div>
       <div className="flex flex-col gap-2 items-start">
-        {props.events
-          ?.reduce(
-            (acc, curr) => {
-              if (!acc.unique.has(curr.id)) {
-                acc.unique.add(curr.id);
-                acc.data.push(curr);
-              }
-              return acc;
-            },
-            { unique: new Set(), data: [] as CalendarEvent[] }
-          )
-          ?.data.map((event) => {
-            return (
+        {eventOfMonth.map((event) => {
+          const startDate = moment(event.start_time).format("DD MMM");
+          const endDate = moment(event.end_time).format("DD MMM");
+          const isSameDay = startDate === endDate;
+          return (
+            <div
+              className="flex gap-2 text-[var(--foreground)] relative overflow-hidden rounded-md"
+              key={event.id}
+            >
               <div
-                className="flex gap-2 text-[var(--foreground)] relative overflow-hidden rounded-md"
-                key={event.id}
-              >
-                <div
-                  className="opacity-30 backdrop-blur-sm left-0 top-0 absolute h-full w-full"
-                  style={{
-                    backgroundColor: event.color ?? "var(--color-red-500)",
-                  }}
-                ></div>
-                <span className="bg-[var(--background)] px-2">
-                  {moment(event.start_time).format("DD")}-
-                  {moment(event.end_time).format("DD")}
-                </span>
-                <p className="pr-2">{event.title}</p>
-              </div>
-            );
-          })}
+                className="opacity-30 backdrop-blur-sm left-0 top-0 absolute h-full w-full"
+                style={{
+                  backgroundColor: event.color ?? "var(--color-red-500)",
+                }}
+              ></div>
+              <span className="bg-[var(--background)] px-2">
+                {isSameDay
+                  ? startDate
+                  : `${moment(event.start_time).format("DD MMM")} -
+                    ${moment(event.end_time).format("DD MMM")}`}
+              </span>
+              <p className="pr-2">{event.title}</p>
+            </div>
+          );
+        })}
       </div>
     </Link>
   );

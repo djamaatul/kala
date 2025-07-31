@@ -10,7 +10,7 @@ type Props = PropsWithChildren<{
   date: string;
   primary: boolean;
   className?: string;
-  events?: CalendarEvent[];
+  events: CalendarEvent[];
 }>;
 
 export default function Date(props: Props) {
@@ -22,6 +22,21 @@ export default function Date(props: Props) {
       `${date.get("years")}/${date.get("month")}/${date.get("date")}`
     );
   };
+
+  const eventsOfDay = props.events.filter((event) => {
+    return (
+      date
+        .startOf("day")
+        .isSameOrAfter(
+          moment(event.start_time, "YYYY-MM-DD HH:mm:ss").startOf("day")
+        ) &&
+      date
+        .endOf("day")
+        .isSameOrBefore(
+          moment(event.end_time, "YYYY-MM-DD HH:mm:ss").endOf("day")
+        )
+    );
+  });
 
   return (
     <button
@@ -35,7 +50,7 @@ export default function Date(props: Props) {
     >
       {date.format("D")}
       <div className="flex flex-col gap-0.5">
-        {props.events?.map((event) => {
+        {eventsOfDay.map((event) => {
           return (
             <div
               className="text-white w-full min-h-1 text-nowrap overflow-hidden text-ellipsis text-xs"
