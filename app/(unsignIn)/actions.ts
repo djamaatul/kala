@@ -3,7 +3,7 @@
 import { z } from "zod";
 import Users from "../repositories/users";
 
-export const registerSchema = z.object({
+const registerSchema = z.object({
   name: z.string().optional(),
   email: z.email(),
   password: z
@@ -15,14 +15,12 @@ export const registerSchema = z.object({
     }),
 });
 
-export const register = async (formData: z.infer<typeof registerSchema>) => {
-  const validation = registerSchema.safeParse(formData);
+export const register = async (formData: FormData) => {
+  const validation = registerSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (!validation.success) return validation.error;
 
-  try {
-    await Users.createUser(validation.data);
-  } catch (err) {
-    console.log(err);
-  }
+  await Users.createUser(validation.data);
 };

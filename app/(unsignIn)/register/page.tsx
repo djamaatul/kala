@@ -30,7 +30,9 @@ export default function Register() {
     <FormProvider {...methods}>
       <form
         className="flex flex-col gap-4"
-        onSubmit={methods.handleSubmit(register)}
+        action={(formData) => {
+          register(formData);
+        }}
       >
         <Field label="Full Name">
           <Input placeholder="Full Name" name="name" />
