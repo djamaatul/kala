@@ -1,19 +1,6 @@
-import { getSession } from "next-auth/react";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "next-auth/middleware";
 
-export default async function middleware(req: NextRequest) {
-  const auth = await getSession({
-    req: {
-      headers: {
-        cookie: req.headers.get("cookie") ?? "",
-      },
-    },
-  });
-
-  if (!auth) return NextResponse.redirect(req.nextUrl.origin + "/login");
-
-  return NextResponse.next();
-}
+export default withAuth(() => {});
 
 export const config = {
   matcher: ["/event"],
