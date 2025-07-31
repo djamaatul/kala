@@ -11,9 +11,14 @@ export default async function Landing() {
   return (
     <div className="min-h-screen overflow-hidden flex flex-col justify-center items-center gap-4">
       <h1 className="text-7xl font-bold text-[var(--foreground)]">KALA</h1>
-      <Link href="/login">
-        <Button>Get Started</Button>
-      </Link>
+      <div className="flex gap-4">
+        <Link href="/login">
+          <Button>Get Started</Button>
+        </Link>
+        <Link href="/calendar">
+          <Button.ghost>Public Event</Button.ghost>
+        </Link>
+      </div>
     </div>
   );
 }

@@ -47,6 +47,23 @@ Button.outline = ({
   );
 };
 
+Button.ghost = ({
+  className,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & Props) => {
+  return (
+    <Button
+      className={cn(
+        "bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20 border border-[var(--foreground)]/10 text-[var(--foreground)]",
+        className
+      )}
+      {...props}
+    >
+      {props.children}
+    </Button>
+  );
+};
+
 Button.link = ({
   className,
   href,

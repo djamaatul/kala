@@ -11,18 +11,14 @@ export default async function NavBar() {
 
   return (
     <header className="bg-[var(--background)]/20 backdrop-blur-sm h-20 flex items-center justify-between sticky top-0 p-4 z-10">
-      {session ? (
-        <Link href="/">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
-            KALA
-          </h1>
-          <p className="text-sm hidden md:inline-block">
-            Atur waktumu, hargai setiap Kala.
-          </p>
-        </Link>
-      ) : (
-        <div></div>
-      )}
+      <Link href="/">
+        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
+          KALA
+        </h1>
+        <p className="text-sm hidden md:inline-block">
+          Atur waktumu, hargai setiap Kala.
+        </p>
+      </Link>
       <div className="flex gap-4 items-center">
         <ThemeSwitcher
           defaultTheme={theme?.value ?? "dark"}

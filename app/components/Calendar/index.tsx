@@ -2,6 +2,7 @@ import { CalendarEvent } from "@/app/repositories/events";
 import CalendarClass from "../../lib/calendar";
 import Month from "./Month";
 import { Suspense } from "react";
+import MonthSkeleton from "@/app/(public)/calendar/components/MonthSkeleton";
 
 type Props = {
   year: number;
@@ -13,7 +14,7 @@ export default function Calendar(props: Props) {
   return (
     <div className="flex flex-col gap-4 justify-center">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<MonthSkeleton />}>
           {months.map((month, index) => {
             return (
               <Month
